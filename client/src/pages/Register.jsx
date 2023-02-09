@@ -1,6 +1,8 @@
 import React from "react";
 import styled from "styled-components";
 import { mobile } from "../responsive";
+import {useState} from 'react'
+// import { useHistory } from "react-router-dom"
 
 const Container = styled.div`
   width: 100vw;
@@ -55,22 +57,71 @@ const Button = styled.button`
 `;
 
 const Register = () => {
+
+  // const history = useHistory()
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  async function registerUser(event) {
+    event.preventDefault()
+    const response = await fetch('http://localhost:5000/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },    
+      body: JSON.stringify({
+        name, email, password,
+      }),   
+    })
+
+    const data = await response.json()
+
+    // if(data.status === 'ok') {
+    //   history.push('/login')
+    // }
+
+    console.log(data)
+  }
+
+
   return (
     <Container>
       <Wrapper>
         <Title>CREATE AN ACCOUNT</Title>
-        <Form>
-          <Input placeholder="name" />
-          <Input placeholder="last name" />
+        <Form onSubmit={registerUser} >
+
           <Input placeholder="username" />
-          <Input placeholder="email" />
-          <Input placeholder="password" />
+
+          <Input 
+           type="text"
+           placeholder="last name"
+           onChange={(e) => setName(e.target.value)}
+           value={name}
+          />
+
+      
+          <Input 
+            type="password"
+            placeholder="password" 
+            onChange={(e) => setPassword(e.target.value)}
+            value={password}
+          />
+
+          <Input 
+            value={email}
+            type="email"
+            placeholder="email"
+            onChange={(e) => setEmail(e.target.value)}
+          />
+
           <Input placeholder="confirm password" />
+
           <Agreement>
             By creating an account, i consent to the processing of my personal
             data in accordance with the <b>PRIVACY POLICY</b>
           </Agreement>
-          <Button>CREATE</Button>
+          <Button type="submit" >CREATE</Button>
         </Form>
       </Wrapper>
     </Container>

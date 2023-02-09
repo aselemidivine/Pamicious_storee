@@ -6,6 +6,7 @@ import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import { Add, Remove } from "@material-ui/icons";
 import { mobile } from "../responsive";
+import { useSelector } from "react-redux";
 
 const Container = styled.div``;
 const Wrapper = styled.div`
@@ -149,6 +150,9 @@ const Button = styled.button`
 `;
 
 const Cart = () => {
+
+  const cart = useSelector(state => state.cart)
+
   return (
     <Container>
       <Navbar />
@@ -165,34 +169,74 @@ const Cart = () => {
         </Top>
         <Bottom>
           <Info>
-            <Product>
+            {cart.products((product) => (
+
+              <Product>
               <ProductDetail>
-                <Image src="https://images.unsplash.com/photo-1513237726167-2ae8ea985930?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTF8fG1vZGVsJTIwZ2xhc3Nlc3xlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60" />
+                <Image src={product.img} />
                 <Details>
                   <ProductName>
-                    <b>Product:</b>ASELEMI THUNDER SHOES{" "}
+                    <b>Product:</b>{product.title}
                   </ProductName>
                   <ProductId>
-                    <b>ID:</b>93813718293{" "}
+                    <b>ID:</b>{product._id}
                   </ProductId>
-                  <ProductColor color="black" />
+                  <ProductColor color={product.color} />
                   <ProductSize>
-                    <b>Size:</b>39.5
+                    <b>Size:</b>{product.size}
                   </ProductSize>
                 </Details>
               </ProductDetail>
               <PriceDetail>
                 <ProductAmountContainer>
                   <Add />
-                  <ProductAmount>2</ProductAmount>
+                  <ProductAmount>{product.quantity}</ProductAmount>
                   <Remove />
                 </ProductAmountContainer>
-                <ProductPrice>$ 37</ProductPrice>
+                <ProductPrice>$ { product.price * product.quantity }</ProductPrice>
               </PriceDetail>
             </Product>
+          ))}
 
             <Hr />
 
+          </Info>
+          <Summary>
+            <SummaryTitle>ORDER SUMMARY</SummaryTitle>
+            <SummaryItem>
+              <SummaryItemText>Subtotal</SummaryItemText>
+              <SummaryItemPrice>$ {cart.total}</SummaryItemPrice>
+            </SummaryItem>
+            <SummaryItem>
+              <SummaryItemText>Estimated shipping</SummaryItemText>
+              <SummaryItemPrice>$ -3.90</SummaryItemPrice>
+            </SummaryItem>
+            <SummaryItem>
+              <SummaryItemText> Shipping Discount</SummaryItemText>
+              <SummaryItemPrice>$ 5.90</SummaryItemPrice>
+            </SummaryItem>
+            <SummaryItem type="total">
+              <SummaryItemText> Shipping Discount</SummaryItemText>
+              <SummaryItemPrice>$ {cart.total}</SummaryItemPrice>
+            </SummaryItem>
+            <Button>CHECKOUT NOW</Button>
+          </Summary>
+        </Bottom>
+      </Wrapper>
+      <Footer />
+    </Container>
+  );
+};
+
+export default Cart;
+
+
+
+
+
+
+
+{/* 
             <Product>
               <ProductDetail>
                 <Image src="https://images.unsplash.com/photo-1513237726167-2ae8ea985930?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTF8fG1vZGVsJTIwZ2xhc3Nlc3xlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60" />
@@ -217,33 +261,4 @@ const Cart = () => {
                 </ProductAmountContainer>
                 <ProductPrice>$ 24</ProductPrice>
               </PriceDetail>
-            </Product>
-          </Info>
-          <Summary>
-            <SummaryTitle>ORDER SUMMARY</SummaryTitle>
-            <SummaryItem>
-              <SummaryItemText>Subtotal</SummaryItemText>
-              <SummaryItemPrice>$ 80</SummaryItemPrice>
-            </SummaryItem>
-            <SummaryItem>
-              <SummaryItemText>Estimated shipping</SummaryItemText>
-              <SummaryItemPrice>$ -3.90</SummaryItemPrice>
-            </SummaryItem>
-            <SummaryItem>
-              <SummaryItemText> Shipping Discount</SummaryItemText>
-              <SummaryItemPrice>$ 5.90</SummaryItemPrice>
-            </SummaryItem>
-            <SummaryItem type="total">
-              <SummaryItemText> Shipping Discount</SummaryItemText>
-              <SummaryItemPrice>$ 80</SummaryItemPrice>
-            </SummaryItem>
-            <Button>CHECKOUT NOW</Button>
-          </Summary>
-        </Bottom>
-      </Wrapper>
-      <Footer />
-    </Container>
-  );
-};
-
-export default Cart;
+            </Product> */}

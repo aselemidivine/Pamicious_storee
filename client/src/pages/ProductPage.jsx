@@ -5,6 +5,11 @@ import Navbar from "./components/Navbar";
 import Newsletter from "./components/Newsletter";
 import { Add, Remove } from "@material-ui/icons";
 import { mobile } from "../responsive";
+import { useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { publicRequest } from "../requestMethods";
+import { addProduct } from "../redux/cartRedux";
+import { useDispatch } from "react-redux";
 
 const Container = styled.div``;
 const Wrapper = styled.div`
@@ -109,48 +114,87 @@ const Button = styled.button`
 const FilterSizeOption = styled.option``;
 
 const ProductPage = () => {
+
+  const location = useLocation();
+  const id = location.pathname.split("/")[2];
+
+  const [ product, setProduct ] = useState({});
+  const [ quantity, setQuantity ] = useState(1);   // A state Change the quantity of the product
+  const [ color, setColor ] = useState("");
+  const [ size, setSize ] = useState("");
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const getProducts = async () => {
+      try {
+        const res = await publicRequest.get("/products/find/"+id)
+        setProduct(res.data);
+      } catch {
+
+      }
+    };
+    getProducts();
+  }, [id]);
+
+
+  const handleQuantity =(type) => {
+        if (type === "decrease") {
+         quantity > 1 && setQuantity(quantity -1);
+        } else {
+          setQuantity(quantity + 1);
+        }
+  };
+
+  // We will be updating our cart in a different component so we need redux state management.
+  const handleClick = () => {
+    dispatch(
+      // Update our cart
+      addProduct({ ...product, quantity, color, size })
+      // addProduct({ product, quantity, price: product.price * quantity })
+    );
+  };
+
+
   return (
     <Container>
       <Navbar />
       <Announcement />
       <Wrapper>
         <ImgContainer>
-          <Image src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8bW9kZWwlMjBnbGFzc2VzfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60" />
+          <Image src={product.img} />
         </ImgContainer>
         <InfoContainer>
-          <Title>fsgaeszggr</Title>
+          <Title>{product.title}</Title>
           <Desc>
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Eligendi
-            sit voluptates in, optio esse, totam aut non odio quaerat quam omnis
-            obcaecati tempora porro aperiam assumenda quas voluptatem. Sunt,
-            vel.
+          {product.desc}
           </Desc>
-          <Price>$ 20</Price>
+          <Price>${product.price}</Price>
           <FilterContainer>
             <Filter>
               <FilterTitle>Color</FilterTitle>
-              <FilterColor color="darkblue" />
-              <FilterColor color="black" />
-              <FilterColor color="gray" />
+              {product.color?.map((c) => (
+                <FilterColor color={c} key={c} onclick={() => setColor(c)} />
+
+              ))}
             </Filter>
             <Filter>
               <FilterTitle>Size</FilterTitle>
-              <FilterSize>
-                <FilterSizeOption>XS</FilterSizeOption>
-                <FilterSizeOption>S</FilterSizeOption>
-                <FilterSizeOption>M</FilterSizeOption>
-                <FilterSizeOption>L</FilterSizeOption>
-                <FilterSizeOption>XL</FilterSizeOption>
+              <FilterSize onChange={(e) => setSize(e.target.value)}>
+                {product.size?.map((s) => (
+                  <FilterSizeOption key={s} >{s}</FilterSizeOption>
+
+                ))}
+                
               </FilterSize>
             </Filter>
           </FilterContainer>
           <AddContainer>
             <AmountContainer>
-              <Remove />
-              <Amount>1</Amount>
-              <Add />
+              <Remove onClick= {() => handleQuantity("decrease")}/>
+              <Amount>{quantity}</Amount>
+              <Add onClick= {() => handleQuantity("increase")} />
             </AmountContainer>
-            <Button>ADD TO CART</Button>
+            <Button onClick={handleClick}>ADD TO CART</Button>
           </AddContainer>
         </InfoContainer>
       </Wrapper>
